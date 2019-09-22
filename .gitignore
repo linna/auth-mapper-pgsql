@@ -1,0 +1,7 @@
+composer.phar
+composer.lock
+clover.xml
+infection-log.txt
+vendor/
+.phan/
+.phpunit.result.cache

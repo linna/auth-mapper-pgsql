@@ -1,0 +1,39 @@
+{
+    "name": "linna/auth-mapper-mysql",
+    "description": "Postgres mapper implementation of the authentication and authorization interfaces.",
+    "keywords": [
+        "php",
+        "mapper",
+        "postgres",
+        "authentication",
+        "authorization"
+    ],
+    "homepage": "https://github.com/linna",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Rapetti",
+            "email": "sebastian.rapetti@tim.it"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "infection/infection": "^0.13",
+        "phpstan/phpstan": "^0.11",
+        "phpunit/phpunit": "^8.0",
+        "linna/framework": "dev-b0.27.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Linna\\Authentication\\": "src/Authentication/",
+            "Linna\\Authorization\\": "src/Authorization/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { 
+            "Linna\\Test\\":  ["tests/Authentication", "tests/Authorization"]
+        }
+    }
+}
