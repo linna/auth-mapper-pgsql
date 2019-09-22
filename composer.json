@@ -1,5 +1,5 @@
 {
-    "name": "linna/auth-mapper-mysql",
+    "name": "linna/auth-mapper-pgsql",
     "description": "Postgres mapper implementation of the authentication and authorization interfaces.",
     "keywords": [
         "php",
