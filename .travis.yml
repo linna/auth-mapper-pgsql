@@ -14,8 +14,8 @@ before_install:
   - sudo service postgresql restart 11 
 
 before_script:
-- psql -U postgres -a -f vendor/linna/db-dumps/src/linna_db_pgsql_test.sql
 - composer install
+- psql -U postgres -a -f vendor/linna/db-dumps/src/linna_db_pgsql_test.sql
 
 script:
 - ./vendor/bin/phpunit
