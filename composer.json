@@ -23,7 +23,8 @@
         "infection/infection": "^0.13",
         "phpstan/phpstan": "^0.11",
         "phpunit/phpunit": "^8.0",
-        "linna/framework": "dev-b0.27.0"
+        "linna/framework": "dev-b0.27.0",
+        "linna/db-dumps": "dev-master"
     },
     "autoload": {
         "psr-4": {
