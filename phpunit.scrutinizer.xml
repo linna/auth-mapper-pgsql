@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.3/phpunit.xsd"
+         colors="true"
+         bootstrap="vendor/autoload.php"
+         verbose="true">
+    <testsuites>
+        <testsuite name="Linna Test Suite">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="clover.xml"/>
+    </logging>
+    <php>
+        <var name="pdo_pgsql_dsn" value="pgsql:dbname=scrutinizer;host=localhost;port=5435"/> 
+        <var name="pdo_pgsql_user" value="scrutinizer" />
+        <var name="pdo_pgsql_password" value="scrutinizer" />
+    </php>
+</phpunit>

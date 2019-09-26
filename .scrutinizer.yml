@@ -19,14 +19,11 @@ build:
     tests:
             override:
                 -
-                    command: './vendor/bin/phpunit --coverage-clover=clover.xml'
+                    command: './vendor/bin/phpunit --coverage-clover=clover.xml -c ./phpunit.scrutinizer.xml'
                     coverage:
                         file: 'clover.xml'
                         format: 'clover'
 
     project_setup:
             before:
-                - sed -i 's/pgsql:dbname=linna_db;host=localhost/pgsql:dbname=scrutinizer;host=localhost;port=5435/g' phpunit.xml
-                - sed -i 's/name="pdo_pgsql_user" value="postgres"/name="pdo_pgsql_user" value="scrutinizer"/g' phpunit.xml
-                - sed -i 's/name="pdo_pgsql_password" value=""/name="pdo_pgsql_password" value="scrutinizer"/g' phpunit.xml
                 - PGPASSWORD=scrutinizer psql -U scrutinizer -p 5435 -a -f vendor/linna/db-dumps/src/linna_db_pgsql_test_scrutinizer.sql
