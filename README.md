@@ -25,7 +25,7 @@
 This package provide a concrete implementation for authentication interfaces and 
 for the authorization interfaces of the framework.
 
-Mappers use as persistent storage mysql through php pdo.
+Mappers use as persistent storage postgresql through php pdo.
 
 # Requirements
    
