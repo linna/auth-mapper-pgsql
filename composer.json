@@ -27,7 +27,8 @@
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^9.0",
         "linna/framework": "dev-master",
-        "linna/db-dumps": "dev-master"
+        "linna/db-dumps": "dev-master",
+        "linna/auth-mapper-test-trait": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -37,7 +38,7 @@
     },
     "autoload-dev": {
         "psr-4": { 
-            "Linna\\Test\\":  ["tests/Authentication", "tests/Authorization"]
+            "Linna\\Tests\\":  ["tests/Authentication", "tests/Authorization"]
         }
     }
 }

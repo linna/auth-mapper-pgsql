@@ -12,11 +12,11 @@ declare(strict_types=1);
 namespace Linna\Tests;
 
 use Linna\Authentication\Password;
-//use Linna\Authentication\UserMapper;
-//use Linna\Authorization\EnhancedUserMapper;
-//use Linna\Authorization\PermissionMapper;
-//use Linna\Authorization\RoleMapper;
+use Linna\Authorization\EnhancedUserMapper;
+use Linna\Authorization\PermissionMapper;
+use Linna\Authorization\RoleMapper;
 use Linna\Authorization\RoleToUserMapper;
+use Linna\Authentication\UserMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -26,15 +26,14 @@ use PHPUnit\Framework\TestCase;
  */
 class RoleToUserMapperTest extends TestCase
 {
-    /**
-     * @var RoleToUserMapper
-     */
-    protected $roleToUserMapper;
+    use RoleToUserMapperTrait;
 
     /**
      * Setup.
+     *
+     * @return void
      */
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
         $options = [
             'dsn'      => $GLOBALS['pdo_pgsql_dsn'],
@@ -47,14 +46,17 @@ class RoleToUserMapperTest extends TestCase
             ],
         ];
 
-        $this->roleToUserMapper = new RoleToUserMapper((new StorageFactory('pdo', $options))->get(), new Password());
-    }
+        $pdo = (new StorageFactory('pdo', $options))->get();
+        $password = new Password();
 
-    /**
-     * Test new instance.
-     */
-    public function testNewInstance()
-    {
-        $this->assertInstanceOf(RoleToUserMapper::class, $this->roleToUserMapper);
+        $permissionMapper = new PermissionMapper($pdo);
+        $role2userMapper = new RoleToUserMapper($pdo, $password);
+        $userMapper = new UserMapper($pdo, $password);
+
+        self::$pdo = $pdo;
+        self::$permissionMapper = $permissionMapper;
+        self::$roleMapper = new RoleMapper($pdo, $permissionMapper, $userMapper, $role2userMapper);
+        self::$enhancedUserMapper = new EnhancedUserMapper($pdo, $password, $permissionMapper, $role2userMapper);
+        self::$roleToUserMapper = $role2userMapper;
     }
 }

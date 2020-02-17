@@ -11,7 +11,12 @@ declare(strict_types=1);
 
 namespace Linna\Tests;
 
+use Linna\Authentication\Password;
+use Linna\Authentication\UserMapper;
+use Linna\Authorization\EnhancedUserMapper;
 use Linna\Authorization\PermissionMapper;
+use Linna\Authorization\RoleMapper;
+use Linna\Authorization\RoleToUserMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -21,15 +26,14 @@ use PHPUnit\Framework\TestCase;
  */
 class PermissionMapperTest extends TestCase
 {
-    /**
-     * @var PermissionMapper
-     */
-    protected $permissionMapper;
+    use PermissionMapperTrait;
 
     /**
      * Setup.
+     *
+     * @return void
      */
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
         $options = [
             'dsn'      => $GLOBALS['pdo_pgsql_dsn'],
@@ -42,14 +46,26 @@ class PermissionMapperTest extends TestCase
             ],
         ];
 
-        $this->permissionMapper = new PermissionMapper((new StorageFactory('pdo', $options))->get());
+        $pdo = (new StorageFactory('pdo', $options))->get();
+        $password = new Password();
+
+        $permissionMapper = new PermissionMapper($pdo);
+        $role2userMapper = new RoleToUserMapper($pdo, $password);
+        $userMapper = new UserMapper($pdo, $password);
+
+        self::$pdo = $pdo;
+        self::$permissionMapper = $permissionMapper;
+        self::$roleMapper = new RoleMapper($pdo, $permissionMapper, $userMapper, $role2userMapper);
+        self::$enhancedUserMapper = new EnhancedUserMapper($pdo, $password, $permissionMapper, $role2userMapper);
     }
 
     /**
-     * Test new instance.
+     * Tear Down.
+     *
+     * @return void
      */
-    public function testNewInstance()
+    public static function tearDownAfterClass(): void
     {
-        $this->assertInstanceOf(PermissionMapper::class, $this->permissionMapper);
+        self::$pdo->exec('ALTER SEQUENCE public.user_user_id_seq RESTART WITH 7 INCREMENT BY 1;');
     }
 }
