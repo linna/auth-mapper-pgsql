@@ -231,7 +231,7 @@ class UserMapperTest extends TestCase
 
         self::$userMapper->save($user);
 
-        $this->assertGreaterThan(0, $user->rId);
+        $this->assertGreaterThan(0, $user->id);
         $this->assertGreaterThan(0, $user->getId());
 
         $userStored = self::$userMapper->fetchByName('test_user');

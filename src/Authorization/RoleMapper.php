@@ -50,7 +50,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT role_id AS "objectId", role_id AS "rId", name, description, active, last_update AS "lastUpdate" FROM public.role';
+    protected $baseQuery = 'SELECT role_id AS "id", name, description, active, last_update AS "lastUpdate" FROM public.role';
 
     /**
      * Constructor.

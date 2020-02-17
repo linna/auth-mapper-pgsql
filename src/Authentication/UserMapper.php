@@ -38,7 +38,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT user_id AS "objectId", user_id AS "rId", uuid, name, email, description, password, active, created, last_update AS "lastUpdate" FROM public.user';
+    protected $baseQuery = 'SELECT user_id AS "id", uuid, name, email, description, password, active, created, last_update AS "lastUpdate" FROM public.user';
 
     /**
      * Constructor.
@@ -105,7 +105,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
 
         $array = $pdos->fetchAll(PDO::FETCH_CLASS, User::class, [$this->password]);
 
-        return \array_combine(\array_column($array, 'rId'), $array);
+        return \array_combine(\array_column($array, 'id'), $array);
     }
 
     /**
@@ -126,7 +126,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
 
         $array = $pdos->fetchAll(PDO::FETCH_CLASS, User::class, [$this->password]);
 
-        return \array_combine(\array_column($array, 'rId'), $array);
+        return \array_combine(\array_column($array, 'id'), $array);
     }
 
     /**

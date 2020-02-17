@@ -14,6 +14,7 @@ namespace Linna\Tests;
 use Linna\Authentication\EnhancedAuthenticationMapper;
 use Linna\Authentication\LoginAttempt;
 use Linna\DataMapper\NullDomainObject;
+use Linna\Storage\ExtendedPDO;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -26,12 +27,12 @@ class EnhancedAuthenticationMapperTest extends TestCase
     /**
      * @var EnhancedAuthenticationMapper The enhanced authentication mapper class.
      */
-    protected static $enhancedAuthenticationMapper;
+    protected static EnhancedAuthenticationMapper $enhancedAuthenticationMapper;
 
     /**
      * @var PDO Database connection.
      */
-    protected static $pdo;
+    protected static ExtendedPDO $pdo;
 
     /**
      * Setup.
@@ -199,14 +200,14 @@ class EnhancedAuthenticationMapperTest extends TestCase
      *
      * @return void
      */
-    public function testFetchLimit(string $userName, int $rId, int $offset, int $rowCount): void
+    public function testFetchLimit(string $userName, int $id, int $offset, int $rowCount): void
     {
         $loginAttempt = self::$enhancedAuthenticationMapper->fetchLimit($offset, $rowCount);
 
         $key = \array_keys($loginAttempt)[0];
 
         $this->assertCount(1, $loginAttempt);
-        $this->assertEquals($loginAttempt[$key]->rId, $rId);
+        $this->assertEquals($loginAttempt[$key]->id, $id);
         $this->assertEquals($loginAttempt[$key]->userName, $userName);
     }
 
@@ -335,15 +336,15 @@ class EnhancedAuthenticationMapperTest extends TestCase
         $loginAttempt->ipAddress = '127.0.0.1';
         $loginAttempt->when = \date(DATE_ATOM);
 
-        $this->assertEquals(0, $loginAttempt->rId);
+        $this->assertEquals(0, $loginAttempt->id);
         $this->assertEquals(0, $loginAttempt->getId());
 
         self::$enhancedAuthenticationMapper->save($loginAttempt);
 
-        $this->assertGreaterThan(0, $loginAttempt->rId);
+        $this->assertGreaterThan(0, $loginAttempt->id);
         $this->assertGreaterThan(0, $loginAttempt->getId());
 
-        $loginAttemptStored = self::$enhancedAuthenticationMapper->fetchById($loginAttempt->rId);
+        $loginAttemptStored = self::$enhancedAuthenticationMapper->fetchById($loginAttempt->id);
 
         $this->assertInstanceOf(LoginAttempt::class, $loginAttemptStored);
     }
@@ -366,7 +367,7 @@ class EnhancedAuthenticationMapperTest extends TestCase
 
         self::$enhancedAuthenticationMapper->save($loginAttemptStored);
 
-        $loginAttemptUpdated = self::$enhancedAuthenticationMapper->fetchById($loginAttemptStored->rId);
+        $loginAttemptUpdated = self::$enhancedAuthenticationMapper->fetchById($loginAttemptStored->id);
 
         $this->assertEquals('qwertyochtzf8gh888q6vnlch5', $loginAttemptUpdated->sessionId);
         $this->assertInstanceOf(LoginAttempt::class, $loginAttemptUpdated);

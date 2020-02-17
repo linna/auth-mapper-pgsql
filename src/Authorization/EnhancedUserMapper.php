@@ -133,14 +133,14 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     public function fetchByPermissionId(int $permissionId): array
     {
         $pdos = $this->pdo->prepare('
-        (SELECT u.user_id AS "objectId", u.user_id AS "rId", u.uuid, u.name, u.email, u.description, 
+        (SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate" 
         FROM public.user AS u
         INNER JOIN public.user_permission AS up
         ON u.user_id = up.user_id
         WHERE up.permission_id = :id)
         UNION
-        (SELECT u.user_id AS "objectId", u.user_id AS "rId", u.uuid, u.name, u.email, u.description, 
+        (SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate" 
         FROM public.user AS u
         INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
@@ -178,7 +178,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     public function fetchByRoleId(int $roleId): array
     {
         $pdos = $this->pdo->prepare('
-        SELECT u.user_id AS "objectId", u.user_id AS "rId", u.uuid, u.name, u.email, u.description, 
+        SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate"
         FROM public.user AS u
         INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
@@ -196,7 +196,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     public function fetchByRoleName(string $roleName): array
     {
         $pdos = $this->pdo->prepare('
-        SELECT u.user_id AS "objectId", u.user_id AS "rId", u.uuid, u.name, u.email, u.description, 
+        SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate"
         FROM public.user AS u
         INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
@@ -223,13 +223,15 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
         $users = [];
 
         while (($user = $pdos->fetch(PDO::FETCH_OBJ)) !== false) {
+            $userId = (int) $user->id;
+
             $tmp = new EnhancedUser(
                 $this->password,
-                $this->roleToUserMapper->fetchByUserId((int) $user->objectId),
-                $this->permissionMapper->fetchByUserId((int) $user->objectId)
+                $this->roleToUserMapper->fetchByUserId($userId),
+                $this->permissionMapper->fetchByUserId($userId)
             );
 
-            $tmp->setId((int) $user->objectId);
+            $tmp->setId($userId);
             $tmp->uuid = $user->uuid;
             $tmp->name = $user->name;
             $tmp->description = $user->description;
@@ -239,7 +241,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
             $tmp->created = $user->created;
             $tmp->lastUpdate = $user->lastUpdate;
 
-            $users[$user->objectId] = $tmp;
+            $users[$userId] = clone $tmp;
         }
 
         return $users;

@@ -27,12 +27,12 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     /**
      * @var ExtendedPDO Database Connection
      */
-    protected $pdo;
+    protected ExtendedPDO $pdo;
 
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT login_attempt_id AS "objectId", login_attempt_id AS "rId", user_name AS "userName", session_id AS "sessionId", ip as "ipAddress", date_time AS "when", last_update AS lastUpdate FROM public.login_attempt';
+    protected string $baseQuery = 'SELECT login_attempt_id AS "id", user_name AS "userName", session_id AS "sessionId", ip as "ipAddress", date_time AS "when", created, last_update AS lastUpdate FROM public.login_attempt';
 
     /**
      * Constructor.
@@ -76,7 +76,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
 
         $array = $pdos->fetchAll(PDO::FETCH_CLASS, LoginAttempt::class);
 
-        return \array_combine(\array_column($array, 'rId'), $array);
+        return \array_combine(\array_column($array, 'id'), $array);
     }
 
     /**
@@ -97,7 +97,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
 
         $array = $pdos->fetchAll(PDO::FETCH_CLASS, LoginAttempt::class);
 
-        return \array_combine(\array_column($array, 'rId'), $array);
+        return \array_combine(\array_column($array, 'id'), $array);
     }
 
     /**
