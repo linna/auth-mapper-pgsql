@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Linna\Authentication;
 
 use InvalidArgumentException;
+use Linna\Authentication\Password;
 use Linna\DataMapper\DomainObjectAbstract;
 use Linna\DataMapper\DomainObjectInterface;
 use Linna\DataMapper\MapperAbstract;
@@ -26,19 +27,19 @@ use RuntimeException;
 class UserMapper extends MapperAbstract implements UserMapperInterface
 {
     /**
-     * @var Password Password utility for user object
+     * @var Password Password util for user object
      */
-    protected $password;
+    protected Password $password;
 
     /**
      * @var ExtendedPDO Database Connection
      */
-    protected $pdo;
+    protected ExtendedPDO $pdo;
 
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT user_id AS "id", uuid, name, email, description, password, active, created, last_update AS "lastUpdate" FROM public.user';
+    protected string $baseQuery = 'SELECT user_id AS "id", uuid, name, email, description, password, active, created, last_update AS "lastUpdate" FROM public.user';
 
     /**
      * Constructor.

@@ -27,12 +27,12 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * @var ExtendedPDO Database Connection
      */
-    protected $pdo;
+    protected ExtendedPDO $pdo;
 
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT permission_id AS "id", name, description, last_update AS "lastUpdate" FROM public.permission';
+    protected string $baseQuery = 'SELECT permission_id AS "id", name, description, last_update AS "lastUpdate" FROM public.permission';
 
     /**
      * Constructor.
@@ -120,7 +120,8 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         $pdos = $this->pdo->prepare('
         SELECT p.permission_id AS "id", p.name, p.description, p.last_update AS "lastUpdate"
         FROM permission AS p
-        INNER JOIN public.role_permission AS rp ON rp.permission_id = p.permission_id
+        INNER JOIN public.role_permission AS rp 
+        ON rp.permission_id = p.permission_id
         WHERE rp.role_id = :id');
 
         $pdos->bindParam(':id', $roleId, PDO::PARAM_INT);
@@ -139,8 +140,10 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         $pdos = $this->pdo->prepare('
         SELECT p.permission_id AS "id", p.name, p.description, p.last_update AS "lastUpdate"
         FROM public.permission AS p
-        INNER JOIN public.role_permission AS rp ON rp.permission_id = p.permission_id
-        INNER JOIN public.role as r ON rp.role_id = r.role_id
+        INNER JOIN public.role_permission AS rp 
+        ON rp.permission_id = p.permission_id
+        INNER JOIN public.role as r 
+        ON rp.role_id = r.role_id
         WHERE r.name = :name');
 
         $pdos->bindParam(':name', $roleName, PDO::PARAM_STR);
@@ -168,15 +171,19 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         (SELECT p.permission_id AS "id", p.name, p.description, 
         0 AS inherited, p.last_update AS "lastUpdate"
         FROM public.permission AS p
-        INNER JOIN public.user_permission AS up ON p.permission_id = up.permission_id
+        INNER JOIN public.user_permission AS up 
+        ON p.permission_id = up.permission_id
         WHERE up.user_id = :id)
         UNION
         (SELECT p.permission_id AS "id", p.name, p.description, 
         r.role_id AS inherited, p.last_update AS "lastUpdate"
         FROM public.permission AS p
-        INNER JOIN public.role_permission as rp ON p.permission_id = rp.permission_id
-        INNER JOIN public.role AS r ON rp.role_id = r.role_id
-        INNER JOIN public.user_role AS ur ON r.role_id = ur.role_id
+        INNER JOIN public.role_permission as rp 
+        ON p.permission_id = rp.permission_id
+        INNER JOIN public.role AS r 
+        ON rp.role_id = r.role_id
+        INNER JOIN public.user_role AS ur 
+        ON r.role_id = ur.role_id
         WHERE ur.user_id = :id)');
 
         $pdos->bindParam(':id', $userId, PDO::PARAM_INT);
@@ -195,16 +202,22 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         $pdos = $this->pdo->prepare('
         (SELECT p.permission_id AS "id", p.name, p.description, 0 AS inherited, p.last_update AS "lastUpdate"
         FROM public.permission AS p
-        INNER JOIN public.user_permission AS up ON p.permission_id = up.permission_id
-        INNER JOIN public.user AS u ON up.user_id = u.user_id
+        INNER JOIN public.user_permission AS up 
+        ON p.permission_id = up.permission_id
+        INNER JOIN public.user AS u 
+        ON up.user_id = u.user_id
         WHERE u.name = :name)
         UNION
         (SELECT p.permission_id AS "id", p.name, p.description, r.role_id AS inherited, p.last_update AS "lastUpdate"
         FROM public.permission AS p
-        INNER JOIN public.role_permission as rp ON p.permission_id = rp.permission_id
-        INNER JOIN public.role AS r ON rp.role_id = r.role_id
-        INNER JOIN public.user_role AS ur ON r.role_id = ur.role_id
-        INNER JOIN public.user AS u ON ur.user_id = u.user_id
+        INNER JOIN public.role_permission as rp 
+        ON p.permission_id = rp.permission_id
+        INNER JOIN public.role AS r 
+        ON rp.role_id = r.role_id
+        INNER JOIN public.user_role AS ur 
+        ON r.role_id = ur.role_id
+        INNER JOIN public.user AS u 
+        ON ur.user_id = u.user_id
         WHERE u.name = :name)');
 
         $pdos->bindParam(':name', $userName, PDO::PARAM_STR);
@@ -227,9 +240,12 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         UNION
         (SELECT encode(digest(concat(u.user_id, '.', rp.permission_id), 'sha256'), 'hex') AS p_hash
         FROM public.user AS u
-        INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
-        INNER JOIN public.role AS r ON ur.role_id = r.role_id
-        INNER JOIN public.role_permission as rp ON r.role_id = rp.role_id 
+        INNER JOIN public.user_role AS ur 
+        ON u.user_id = ur.user_id
+        INNER JOIN public.role AS r 
+        ON ur.role_id = r.role_id
+        INNER JOIN public.role_permission as rp 
+        ON r.role_id = rp.role_id 
 	WHERE u.user_id = :id)
         ORDER BY p_hash");
 

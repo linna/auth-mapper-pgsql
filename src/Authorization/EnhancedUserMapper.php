@@ -15,6 +15,8 @@ use InvalidArgumentException;
 use Linna\Authentication\Password;
 use Linna\Authentication\User;
 use Linna\Authentication\UserMapper;
+use Linna\Authorization\PermissionMapperInterface;
+use Linna\Authorization\RoleToUserMapperInterface;
 use Linna\DataMapper\DomainObjectInterface;
 use Linna\DataMapper\NullDomainObject;
 use Linna\Storage\ExtendedPDO;
@@ -30,12 +32,12 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * @var PermissionMapperInterface Permission Mapper
      */
-    protected $permissionMapper;
+    protected PermissionMapperInterface $permissionMapper;
 
     /**
      * @var RoleToUserMapperInterface Role to user Mapper
      */
-    protected $roleToUserMapper;
+    protected RoleToUserMapperInterface $roleToUserMapper;
 
     /**
      * Class Constructor.
@@ -181,7 +183,8 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
         SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate"
         FROM public.user AS u
-        INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
+        INNER JOIN public.user_role AS ur 
+        ON u.user_id = ur.user_id
         WHERE ur.role_id = :id');
 
         $pdos->bindParam(':id', $roleId, PDO::PARAM_INT);
@@ -199,8 +202,10 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
         SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
         u.password, u.active, u.created, u.last_update AS "lastUpdate"
         FROM public.user AS u
-        INNER JOIN public.user_role AS ur ON u.user_id = ur.user_id
-        INNER JOIN public.role AS r ON ur.role_id = r.role_id
+        INNER JOIN public.user_role AS ur 
+        ON u.user_id = ur.user_id
+        INNER JOIN public.role AS r 
+        ON ur.role_id = r.role_id
 	WHERE r.name = :name');
 
         $pdos->bindParam(':name', $roleName, PDO::PARAM_STR);

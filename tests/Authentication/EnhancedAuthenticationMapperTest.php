@@ -30,7 +30,7 @@ class EnhancedAuthenticationMapperTest extends TestCase
     protected static EnhancedAuthenticationMapper $enhancedAuthenticationMapper;
 
     /**
-     * @var PDO Database connection.
+     * @var ExtendedPDO Database connection.
      */
     protected static ExtendedPDO $pdo;
 

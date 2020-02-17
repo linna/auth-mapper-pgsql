@@ -30,27 +30,27 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * @var ExtendedPDO Database Connection
      */
-    protected $pdo;
+    protected ExtendedPDO $pdo;
 
     /**
      * @var PermissionMapperInterface Permission Mapper
      */
-    protected $permissionMapper;
+    protected PermissionMapperInterface $permissionMapper;
 
     /**
      * @var UserMapperInterface Permission Mapper
      */
-    protected $userMapper;
+    protected UserMapperInterface $userMapper;
 
     /**
      * @var RoleToUserMapperInterface Role To User Mapper
      */
-    protected $roleToUserMapper;
+    protected RoleToUserMapperInterface $roleToUserMapper;
 
     /**
      * @var string Constant part of SELECT query
      */
-    protected $baseQuery = 'SELECT role_id AS "id", name, description, active, last_update AS "lastUpdate" FROM public.role';
+    protected string $baseQuery = 'SELECT role_id AS "id", name, description, active, last_update AS "lastUpdate" FROM public.role';
 
     /**
      * Constructor.
@@ -82,6 +82,29 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
 
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE role_id = :id");
         $pdos->bindParam(':id', $roleId, PDO::PARAM_INT);
+        $pdos->execute();
+
+        $role = $pdos->fetchObject(Role::class, [$users, $permissions]);
+
+        unset($users, $permissions);
+
+        if ($role instanceof Role) {
+            return $role;
+        }
+
+        return new NullDomainObject();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fetchByName(string $roleName): DomainObjectInterface
+    {
+        $users = $this->roleToUserMapper->fetchByRoleName($roleName);
+        $permissions = $this->permissionMapper->fetchByRoleName($roleName);
+
+        $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE name = :name");
+        $pdos->bindParam(':name', $roleName, PDO::PARAM_STR);
         $pdos->execute();
 
         $role = $pdos->fetchObject(Role::class, [$users, $permissions]);
@@ -135,7 +158,8 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
         $pdos = $this->pdo->prepare('
         SELECT r.role_id AS "objectId", r.role_id AS "rId", r.name, r.description, r.active, r.last_update AS "lastUpdate"
         FROM public.role AS r
-        INNER JOIN public.role_permission AS rp ON r.role_id = rp.role_id
+        INNER JOIN public.role_permission AS rp 
+        ON r.role_id = rp.role_id
         WHERE rp.permission_id = :id');
 
         $pdos->bindParam(':id', $permissionId, PDO::PARAM_INT);
@@ -170,7 +194,8 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
         $pdos = $this->pdo->prepare('
         SELECT r.role_id AS "objectId", r.role_id AS "rId", r.name, r.description, r.active, r.last_update AS "lastUpdate"
         FROM public.role AS r
-        INNER JOIN public.user_role AS ur ON r.role_id = ur.role_id
+        INNER JOIN public.user_role AS ur 
+        ON r.role_id = ur.role_id
         WHERE ur.user_id = :id');
 
         $pdos->bindParam(':id', $userId, PDO::PARAM_INT);
@@ -203,18 +228,21 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
         $roles = [];
 
         while (($role = $pdos->fetch(PDO::FETCH_OBJ)) !== false) {
+            $roleId = (int) $role->id;
+
             $tmp = new Role(
-                $this->roleToUserMapper->fetchByRoleId((int) $role->objectId),
-                $this->permissionMapper->fetchByRoleId((int) $role->objectId)
+                $this->roleToUserMapper->fetchByRoleId($roleId),
+                $this->permissionMapper->fetchByRoleId($roleId)
             );
 
-            $tmp->setId((int) $role->objectId);
+            $tmp->setId($roleId);
             $tmp->active = (int) $role->active;
             $tmp->description = $role->description;
             $tmp->name = $role->name;
+            $tmp->created = $role->created;
             $tmp->lastUpdate = $role->lastUpdate;
 
-            $roles[$role->objectId] = $tmp;
+            $roles[$roleId] =  clone $tmp;
         }
 
         return $roles;
