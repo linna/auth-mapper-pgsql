@@ -24,6 +24,11 @@ class EnhancedAuthenticationMapperTest extends TestCase
     use EnhancedAuthenticationMapperTrait;
 
     /**
+     * @var string Date format string. 
+     */
+    protected static string $date_format = DATE_ATOM;
+    
+    /**
      * Setup.
      *
      * @return void
