@@ -274,7 +274,8 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
             $pdos->bindParam(':permission_id', $permissionId, PDO::PARAM_INT);
             $pdos->execute();
 
-            $user = $this->fetchById($userId);
+            $user = $this->fetchById((int) $userId);
+ 
         } catch (PDOException $e) {
             //here log the error
         }
@@ -311,7 +312,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
         $pdos->bindParam(':permission_id', $permissionId, PDO::PARAM_INT);
         $pdos->execute();
 
-        $user = $this->fetchById($userId);
+        $user = $this->fetchById((int) $userId);
     }
 
     /**
@@ -346,7 +347,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
             $pdos->bindParam(':role_id', $roleId, PDO::PARAM_INT);
             $pdos->execute();
 
-            $user = $this->fetchById($userId);
+            $user = $this->fetchById((int) $userId);
         } catch (PDOException $e) {
             //here log the error
         }
@@ -366,7 +367,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
             $pdos->bindParam(':role_name', $roleName, PDO::PARAM_STR);
             $pdos->execute();
 
-            $user = $this->fetchById($userId);
+            $user = $this->fetchById((int) $userId);
         } catch (PDOException $e) {
             //here log the error
         }
@@ -393,7 +394,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
         $pdos->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $pdos->execute();
 
-        $user = $this->fetchById($userId);
+        $user = $this->fetchById((int) $userId);
     }
 
     /**
@@ -405,11 +406,11 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
 
         $pdos = $this->pdo->prepare('DELETE FROM public.user_role WHERE role_id = (SELECT role_id FROM public.role WHERE name = :role_name) AND user_id = :user_id');
 
-        $pdos->bindParam(':role_id', $roleName, PDO::PARAM_INT);
+        $pdos->bindParam(':role_name', $roleName, PDO::PARAM_STR);
         $pdos->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $pdos->execute();
 
-        $user = $this->fetchById($userId);
+        $user = $this->fetchById((int) $userId);
     }
 
     /**

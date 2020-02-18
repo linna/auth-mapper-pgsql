@@ -127,7 +127,7 @@ class RoleToUserMapper implements RoleToUserMapperInterface
     public function fetchByUserName(string $userName): array
     {
         $pdos = $this->pdo->prepare('
-        SELECT r.role_id AS "id", r.name, r.description, r.active, r.created r.last_update AS "lastUpdate"
+        SELECT r.role_id AS "id", r.name, r.description, r.active, r.created, r.last_update AS "lastUpdate"
         FROM public.role AS r
         INNER JOIN public.user_role AS ur 
         ON r.role_id = ur.role_id
