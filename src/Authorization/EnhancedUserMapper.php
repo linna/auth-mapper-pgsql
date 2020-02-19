@@ -275,7 +275,6 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
             $pdos->execute();
 
             $user = $this->fetchById((int) $userId);
- 
         } catch (PDOException $e) {
             //here log the error
         }
