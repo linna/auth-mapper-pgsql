@@ -17,13 +17,13 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": ">=8.1",
         "ext-pdo": "*",
         "ext-pdo_pgsql": "*",
         "ext-pgsql": "*"
     },
     "require-dev": {
-        "infection/infection": "^0.15",
+        "infection/infection": "^0.21",
         "phpstan/phpstan": "^0.12",
         "phpunit/phpunit": "^9.0",
         "linna/framework": "dev-master",
@@ -32,13 +32,17 @@
     },
     "autoload": {
         "psr-4": {
-            "Linna\\Authentication\\": "src/Authentication/",
-            "Linna\\Authorization\\": "src/Authorization/"
+            "Linna\\": "src/Linna/"
         }
     },
     "autoload-dev": {
-        "psr-4": { 
-            "Linna\\Tests\\":  ["tests/Authentication", "tests/Authorization"]
+        "psr-4": {
+            "Linna\\":  "tests/Linna/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
         }
     }
 }

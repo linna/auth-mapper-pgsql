@@ -62,7 +62,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchById(int $userId): DomainObjectInterface
+    public function fetchById(string|int $userId): DomainObjectInterface
     {
         $roles = $this->roleToUserMapper->fetchByUserId($userId);
         $permissions = $this->permissionMapper->fetchByUserId($userId);
@@ -132,7 +132,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByPermissionId(int $permissionId): array
+    public function fetchByPermissionId(string|int $permissionId): array
     {
         $pdos = $this->pdo->prepare('
         (SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
@@ -163,7 +163,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     {
         $permission = $this->permissionMapper->fetchByName($permissionName);
 
-        return $this->fetchByPermissionId($permission->getId());
+        return $this->fetchByPermissionId((int) $permission->getId());
     }
 
     /**
@@ -177,7 +177,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByRoleId(int $roleId): array
+    public function fetchByRoleId(string|int $roleId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
@@ -263,7 +263,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function grantPermissionById(EnhancedUser &$user, int $permissionId)
+    public function grantPermissionById(EnhancedUser &$user, string|int $permissionId)
     {
         $userId = $user->getId();
 
@@ -301,7 +301,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function revokePermissionById(EnhancedUser &$user, int $permissionId)
+    public function revokePermissionById(EnhancedUser &$user, string|int $permissionId)
     {
         $userId = $user->getId();
 
@@ -335,7 +335,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function addRoleById(EnhancedUser &$user, int $roleId)
+    public function addRoleById(EnhancedUser &$user, string|int $roleId)
     {
         $userId = $user->getId();
 
@@ -383,7 +383,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function removeRoleById(EnhancedUser &$user, int $roleId)
+    public function removeRoleById(EnhancedUser &$user, string|int $roleId)
     {
         $userId = $user->getId();
 
@@ -423,7 +423,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    protected function checkDomainObjectType(DomainObjectInterface $domainObject)
+    protected function checkDomainObjectType(DomainObjectInterface $domainObject): void
     {
         if (!($domainObject instanceof EnhancedUser)) {
             throw new InvalidArgumentException('Domain Object parameter must be instance of EnhancedUser class');

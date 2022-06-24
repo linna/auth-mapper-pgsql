@@ -12,14 +12,13 @@
 
 <div align="center">
 
-[![Build Status](https://travis-ci.org/linna/auth-mapper-pgsql.svg?branch=master)](https://travis-ci.org/linna/auth-mapper-pgsql)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/linna/auth-mapper-pgsql/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/linna/auth-mapper-pgsql/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/linna/auth-mapper-pgsql/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/linna/auth-mapper-pgsql/?branch=master)
 [![StyleCI](https://github.styleci.io/repos/209962835/shield?branch=master&style=flat)](https://github.styleci.io/repos/209962835)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat)](https://github.com/php-pds/skeleton)
-[![PHP 7.4](https://img.shields.io/badge/PHP-7.4-8892BF.svg)](http://php.net)
+[![PHP 8.1](https://img.shields.io/badge/PHP-8.1-8892BF.svg)](http://php.net)
 
 </div>
+
+> **_NOTE:_**  Code porting to PHP 8.1 ongoing.
 
 # About
 This package provide a concrete implementation for authentication interfaces and 
@@ -29,7 +28,7 @@ Mappers use as persistent storage postgresql through php pdo.
 
 # Requirements
    
-   * PHP >= 7.4
+   * PHP >= 8.1
    * PDO extension
    * Postgresql extension
    * linna/framework v0.27.0

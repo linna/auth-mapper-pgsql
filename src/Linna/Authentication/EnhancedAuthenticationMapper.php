@@ -47,11 +47,11 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     /**
      * Fetch a login attempt by id.
      *
-     * @param int $loginAttemptId
+     * @param string|int $loginAttemptId
      *
      * @return DomainObjectInterface
      */
-    public function fetchById(int $loginAttemptId): DomainObjectInterface
+    public function fetchById(string|int $loginAttemptId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE login_attempt_id = :id");
 
@@ -201,8 +201,10 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
      * storage record.
      *
      * @param DomainObjectInterface $loginAttempt
+     *
+     * @return void
      */
-    protected function concreteInsert(DomainObjectInterface &$loginAttempt)
+    protected function concreteInsert(DomainObjectInterface &$loginAttempt): void
     {
         $this->checkDomainObjectType($loginAttempt);
 
@@ -226,8 +228,10 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
      * Update a LoginAttempt object in persistent storage.
      *
      * @param DomainObjectInterface $loginAttempt
+     *
+     * @return void
      */
-    protected function concreteUpdate(DomainObjectInterface $loginAttempt)
+    protected function concreteUpdate(DomainObjectInterface $loginAttempt): void
     {
         $this->checkDomainObjectType($loginAttempt);
 
@@ -255,8 +259,10 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
      * deletion.
      *
      * @param DomainObjectInterface $domainObject
+     *
+     * @return void
      */
-    protected function concreteDelete(DomainObjectInterface &$loginAttempt)
+    protected function concreteDelete(DomainObjectInterface &$loginAttempt): void
     {
         $this->checkDomainObjectType($loginAttempt);
 
@@ -278,9 +284,11 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
      *
      * @param DomainObjectInterface $domainObject
      *
+     * @return void
+     *
      * @throws InvalidArgumentException if the domain object isn't of the type required by mapper
      */
-    protected function checkDomainObjectType(DomainObjectInterface $domainObject)
+    protected function checkDomainObjectType(DomainObjectInterface $domainObject): void
     {
         if (!($domainObject instanceof LoginAttempt)) {
             throw new InvalidArgumentException('Domain Object parameter must be instance of LoginAttempt class');

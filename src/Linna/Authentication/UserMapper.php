@@ -56,11 +56,11 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
     /**
      * Fetch a user by id.
      *
-     * @param int $userId
+     * @param string|int $userId
      *
      * @return DomainObjectInterface
      */
-    public function fetchById(int $userId): DomainObjectInterface
+    public function fetchById(string|int $userId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE user_id = :id");
 
@@ -146,8 +146,10 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
      * storage record.
      *
      * @param DomainObjectInterface $user
+     *
+     * @return void
      */
-    protected function concreteInsert(DomainObjectInterface &$user)
+    protected function concreteInsert(DomainObjectInterface &$user): void
     {
         $this->checkDomainObjectType($user);
 
@@ -171,8 +173,10 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
      * Update a User object in persistent storage.
      *
      * @param DomainObjectInterface $user
+     *
+     * @return void
      */
-    protected function concreteUpdate(DomainObjectInterface $user)
+    protected function concreteUpdate(DomainObjectInterface $user): void
     {
         $this->checkDomainObjectType($user);
 
@@ -200,8 +204,10 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
      * deletion.
      *
      * @param DomainObjectInterface $domainObject
+     *
+     * @return void
      */
-    protected function concreteDelete(DomainObjectInterface &$user)
+    protected function concreteDelete(DomainObjectInterface &$user): void
     {
         $this->checkDomainObjectType($user);
 
@@ -223,9 +229,11 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
      *
      * @param DomainObjectInterface $domainObject
      *
+     * @return void
+     *
      * @throws InvalidArgumentException if the domain object isn't of the type required by mapper
      */
-    protected function checkDomainObjectType(DomainObjectInterface $domainObject)
+    protected function checkDomainObjectType(DomainObjectInterface $domainObject): void
     {
         if (!($domainObject instanceof User)) {
             throw new InvalidArgumentException('Domain Object parameter must be instance of User class');

@@ -47,7 +47,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchById(int $permissionId): DomainObjectInterface
+    public function fetchById(string|int $permissionId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE permission_id = :id");
 
@@ -115,7 +115,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByRoleId(int $roleId): array
+    public function fetchByRoleId(string|int $roleId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT p.permission_id AS "id", p.name, p.description, p.last_update AS "lastUpdate"
@@ -165,7 +165,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByUserId(int $userId): array
+    public function fetchByUserId(string|int $userId): array
     {
         $pdos = $this->pdo->prepare('
         (SELECT p.permission_id AS "id", p.name, p.description, 
@@ -231,7 +231,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchUserPermissionHashTable(int $userId): array
+    public function fetchUserPermissionHashTable(string|int $userId): array
     {
         $pdos = $this->pdo->prepare("(SELECT encode(digest(concat(u.user_id, '.', up.permission_id), 'sha256'), 'hex') AS p_hash
         FROM public.user AS u
@@ -258,7 +258,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function permissionExistById(int $permissionId): bool
+    public function permissionExistById(string|int $permissionId): bool
     {
         $pdos = $this->pdo->prepare('SELECT permission_id FROM public.permission WHERE permission_id = :id');
 
@@ -292,7 +292,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    protected function concreteInsert(DomainObjectInterface &$permission)
+    protected function concreteInsert(DomainObjectInterface &$permission): void
     {
         $this->checkDomainObjectType($permission);
 
@@ -312,7 +312,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    protected function concreteUpdate(DomainObjectInterface $permission)
+    protected function concreteUpdate(DomainObjectInterface $permission): void
     {
         $this->checkDomainObjectType($permission);
 
@@ -333,7 +333,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    protected function concreteDelete(DomainObjectInterface &$permission)
+    protected function concreteDelete(DomainObjectInterface &$permission): void
     {
         $this->checkDomainObjectType($permission);
 
@@ -354,7 +354,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    protected function checkDomainObjectType(DomainObjectInterface $domainObject)
+    protected function checkDomainObjectType(DomainObjectInterface $domainObject): void
     {
         if (!($domainObject instanceof Permission)) {
             throw new InvalidArgumentException('Domain Object parameter must be instance of Permission class');
