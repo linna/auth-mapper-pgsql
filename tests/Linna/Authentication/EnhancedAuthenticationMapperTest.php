@@ -9,9 +9,8 @@
  */
 declare(strict_types=1);
 
-namespace Linna\Tests;
+namespace Linna\Authentication;
 
-use Linna\Authentication\EnhancedAuthenticationMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;

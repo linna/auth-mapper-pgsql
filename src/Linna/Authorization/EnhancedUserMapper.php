@@ -15,8 +15,6 @@ use InvalidArgumentException;
 use Linna\Authentication\Password;
 use Linna\Authentication\User;
 use Linna\Authentication\UserMapper;
-use Linna\Authorization\PermissionMapperInterface;
-use Linna\Authorization\RoleToUserMapperInterface;
 use Linna\DataMapper\DomainObjectInterface;
 use Linna\DataMapper\NullDomainObject;
 use Linna\Storage\ExtendedPDO;

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Linna\Authentication;
 
 use InvalidArgumentException;
-use Linna\Authentication\Password;
 use Linna\DataMapper\DomainObjectAbstract;
 use Linna\DataMapper\DomainObjectInterface;
 use Linna\DataMapper\MapperAbstract;

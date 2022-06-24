@@ -9,13 +9,9 @@
  */
 declare(strict_types=1);
 
-namespace Linna\Tests;
+namespace Linna\Authorization;
 
 use Linna\Authentication\Password;
-use Linna\Authorization\EnhancedUserMapper;
-use Linna\Authorization\PermissionMapper;
-use Linna\Authorization\RoleMapper;
-use Linna\Authorization\RoleToUserMapper;
 use Linna\Authentication\UserMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
