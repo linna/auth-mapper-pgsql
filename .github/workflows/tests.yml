@@ -43,7 +43,7 @@ jobs:
         run: composer install
 
       - name: Load Postgres database
-        run: PGPASSWORD=password psql -U postgres -h0.0.0.0 -a -f vendor/linna/db-dumps/src/linna_db_pgsql.sql
+        run: PGPASSWORD=password psql -U postgres -h0.0.0.0 -a -f vendor/linna/db-dumps/src/linna_db_pgsql_test.sql
 
       - name: Execute tests
         run: vendor/bin/phpunit -c phpunit.xml --verbose
