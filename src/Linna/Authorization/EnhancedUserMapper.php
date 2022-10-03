@@ -27,14 +27,10 @@ use PDOStatement;
  */
 class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterface
 {
-    /**
-     * @var PermissionMapperInterface Permission Mapper
-     */
+    /** @var PermissionMapperInterface Permission Mapper */
     protected PermissionMapperInterface $permissionMapper;
 
-    /**
-     * @var RoleToUserMapperInterface Role to user Mapper
-     */
+    /** @var RoleToUserMapperInterface Role to user Mapper */
     protected RoleToUserMapperInterface $roleToUserMapper;
 
     /**

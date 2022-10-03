@@ -27,29 +27,19 @@ use RuntimeException;
  */
 class RoleMapper extends MapperAbstract implements RoleMapperInterface
 {
-    /**
-     * @var ExtendedPDO Database Connection
-     */
+    /** @var ExtendedPDO Database Connection */
     protected ExtendedPDO $pdo;
 
-    /**
-     * @var PermissionMapperInterface Permission Mapper
-     */
+    /** @var PermissionMapperInterface Permission Mapper */
     protected PermissionMapperInterface $permissionMapper;
 
-    /**
-     * @var UserMapperInterface Permission Mapper
-     */
+    /** @var UserMapperInterface Permission Mapper */
     protected UserMapperInterface $userMapper;
 
-    /**
-     * @var RoleToUserMapperInterface Role To User Mapper
-     */
+    /** @var RoleToUserMapperInterface Role To User Mapper */
     protected RoleToUserMapperInterface $roleToUserMapper;
 
-    /**
-     * @var string Constant part of SELECT query
-     */
+    /** @var string Constant part of SELECT query */
     protected string $baseQuery = 'SELECT role_id AS "id", name, description, active, created, last_update AS "lastUpdate" FROM public.role';
 
     /**

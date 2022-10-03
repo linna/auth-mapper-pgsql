@@ -23,10 +23,10 @@
         "ext-pgsql": "*"
     },
     "require-dev": {
-        "infection/infection": "^0.21",
-        "phpstan/phpstan": "^0.12",
-        "phpunit/phpunit": "^9.0",
-        "linna/framework": "dev-master",
+        "infection/infection": ">=0.26",
+        "phpstan/phpstan": ">=1.8",
+        "phpunit/phpunit": ">=9.0",
+        "linna/framework": "^0.27.0",
         "linna/db-dumps": "dev-master",
         "linna/auth-mapper-test-trait": "dev-master"
     },

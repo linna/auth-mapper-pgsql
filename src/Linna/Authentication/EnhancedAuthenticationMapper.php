@@ -24,14 +24,10 @@ use RuntimeException;
  */
 class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAuthenticationMapperInterface
 {
-    /**
-     * @var ExtendedPDO Database Connection
-     */
+    /** @var ExtendedPDO Database Connection */
     protected ExtendedPDO $pdo;
 
-    /**
-     * @var string Constant part of SELECT query
-     */
+    /** @var string Constant part of SELECT query */
     protected string $baseQuery = 'SELECT login_attempt_id AS "id", user_name AS "userName", session_id AS "sessionId", ip as "ipAddress", date_time AS "when", created, last_update AS lastUpdate FROM public.login_attempt';
 
     /**

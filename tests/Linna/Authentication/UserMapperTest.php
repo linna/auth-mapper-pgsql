@@ -44,6 +44,8 @@ class UserMapperTest extends TestCase
 
         self::$pdo = $pdo;
         self::$userMapper = new UserMapper($pdo, new Password());
+
+        self::$pdo->exec('ALTER SEQUENCE public.user_user_id_seq RESTART WITH 8 INCREMENT BY 1;');
     }
 
     /**

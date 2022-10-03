@@ -21,14 +21,10 @@ use PDO;
  */
 class RoleToUserMapper implements RoleToUserMapperInterface
 {
-    /**
-     * @var Password Password utility for user object
-     */
+    /** @var Password Password utility for user object */
     protected Password $password;
 
-    /**
-     * @var ExtendedPDO Database Connection
-     */
+    /** @var ExtendedPDO Database Connection */
     protected ExtendedPDO $pdo;
 
     /**

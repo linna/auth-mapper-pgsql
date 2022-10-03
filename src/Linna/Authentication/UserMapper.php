@@ -25,19 +25,13 @@ use RuntimeException;
  */
 class UserMapper extends MapperAbstract implements UserMapperInterface
 {
-    /**
-     * @var Password Password util for user object
-     */
+    /** @var Password Password util for user object */
     protected Password $password;
 
-    /**
-     * @var ExtendedPDO Database Connection
-     */
+    /** @var ExtendedPDO Database Connection */
     protected ExtendedPDO $pdo;
 
-    /**
-     * @var string Constant part of SELECT query
-     */
+    /** @var string Constant part of SELECT query */
     protected string $baseQuery = 'SELECT user_id AS "id", uuid, name, email, description, password, active, created, last_update AS "lastUpdate" FROM public.user';
 
     /**

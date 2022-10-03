@@ -1,5 +1,5 @@
 <div align="center">
-    <a href="#"><img src="logo-linna-96.png" alt="Linna Logo"></a>
+    <a href="#"><img src="logo-linna-128.png" alt="Linna Logo"></a>
 </div>
 
 <br/>
@@ -13,7 +13,6 @@
 <div align="center">
 
 [![Tests](https://github.com/linna/auth-mapper-pgsql/actions/workflows/tests.yml/badge.svg)](https://github.com/linna/auth-mapper-pgsql/actions/workflows/tests.yml)
-[![StyleCI](https://github.styleci.io/repos/209962835/shield?branch=master&style=flat)](https://github.styleci.io/repos/209962835)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat)](https://github.com/php-pds/skeleton)
 [![PHP 8.1](https://img.shields.io/badge/PHP-8.1-8892BF.svg)](http://php.net)
 

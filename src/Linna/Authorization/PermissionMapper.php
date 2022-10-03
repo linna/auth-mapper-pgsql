@@ -24,14 +24,10 @@ use RuntimeException;
  */
 class PermissionMapper extends MapperAbstract implements PermissionMapperInterface
 {
-    /**
-     * @var ExtendedPDO Database Connection
-     */
+    /** @var ExtendedPDO Database Connection */
     protected ExtendedPDO $pdo;
 
-    /**
-     * @var string Constant part of SELECT query
-     */
+    /** @var string Constant part of SELECT query */
     protected string $baseQuery = 'SELECT permission_id AS "id", name, description, last_update AS "lastUpdate" FROM public.permission';
 
     /**
