@@ -49,11 +49,11 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
     /**
      * Fetch a user by id.
      *
-     * @param string|int $userId
+     * @param int|string $userId
      *
      * @return DomainObjectInterface
      */
-    public function fetchById(string|int $userId): DomainObjectInterface
+    public function fetchById(int|string $userId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE user_id = :id");
 

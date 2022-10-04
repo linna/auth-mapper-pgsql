@@ -50,7 +50,7 @@ class RoleToUserMapper implements RoleToUserMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchByRoleId(int $roleId): array
+    public function fetchByRoleId(int|string $roleId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, u.password, u.active, u.created, u.last_update AS "lastUpdate"
@@ -101,7 +101,7 @@ class RoleToUserMapper implements RoleToUserMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchByUserId(int $userId): array
+    public function fetchByUserId(int|string $userId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT r.role_id AS "id", r.name, r.description, r.active, r.created, r.last_update AS "lastUpdate"

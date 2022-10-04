@@ -56,7 +56,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchById(string|int $userId): DomainObjectInterface
+    public function fetchById(int|string $userId): DomainObjectInterface
     {
         $roles = $this->roleToUserMapper->fetchByUserId($userId);
         $permissions = $this->permissionMapper->fetchByUserId($userId);
@@ -126,7 +126,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByPermissionId(string|int $permissionId): array
+    public function fetchByPermissionId(int|string $permissionId): array
     {
         $pdos = $this->pdo->prepare('
         (SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
@@ -171,7 +171,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByRoleId(string|int $roleId): array
+    public function fetchByRoleId(int|string $roleId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT u.user_id AS "id", u.uuid, u.name, u.email, u.description, 
@@ -257,7 +257,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function grantPermissionById(EnhancedUser &$user, string|int $permissionId)
+    public function grantPermissionById(EnhancedUser &$user, int|string $permissionId)
     {
         $userId = $user->getId();
 
@@ -295,7 +295,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function revokePermissionById(EnhancedUser &$user, string|int $permissionId)
+    public function revokePermissionById(EnhancedUser &$user, int|string $permissionId)
     {
         $userId = $user->getId();
 
@@ -329,7 +329,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function addRoleById(EnhancedUser &$user, string|int $roleId)
+    public function addRoleById(EnhancedUser &$user, int|string $roleId)
     {
         $userId = $user->getId();
 
@@ -377,7 +377,7 @@ class EnhancedUserMapper extends UserMapper implements EnhancedUserMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function removeRoleById(EnhancedUser &$user, string|int $roleId)
+    public function removeRoleById(EnhancedUser &$user, int|string $roleId)
     {
         $userId = $user->getId();
 

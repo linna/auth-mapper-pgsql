@@ -43,7 +43,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchById(string|int $permissionId): DomainObjectInterface
+    public function fetchById(int|string $permissionId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE permission_id = :id");
 
@@ -111,7 +111,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByRoleId(string|int $roleId): array
+    public function fetchByRoleId(int|string $roleId): array
     {
         $pdos = $this->pdo->prepare('
         SELECT p.permission_id AS "id", p.name, p.description, p.last_update AS "lastUpdate"
@@ -161,7 +161,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchByUserId(string|int $userId): array
+    public function fetchByUserId(int|string $userId): array
     {
         $pdos = $this->pdo->prepare('
         (SELECT p.permission_id AS "id", p.name, p.description, 
@@ -227,7 +227,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function fetchUserPermissionHashTable(string|int $userId): array
+    public function fetchUserPermissionHashTable(int|string $userId): array
     {
         $pdos = $this->pdo->prepare("(SELECT encode(digest(concat(u.user_id, '.', up.permission_id), 'sha256'), 'hex') AS p_hash
         FROM public.user AS u
@@ -254,7 +254,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     /**
      * {@inheritdoc}
      */
-    public function permissionExistById(string|int $permissionId): bool
+    public function permissionExistById(int|string $permissionId): bool
     {
         $pdos = $this->pdo->prepare('SELECT permission_id FROM public.permission WHERE permission_id = :id');
 

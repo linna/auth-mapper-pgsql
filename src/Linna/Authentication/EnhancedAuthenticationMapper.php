@@ -43,11 +43,11 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     /**
      * Fetch a login attempt by id.
      *
-     * @param string|int $loginAttemptId
+     * @param int|string $loginAttemptId
      *
      * @return DomainObjectInterface
      */
-    public function fetchById(string|int $loginAttemptId): DomainObjectInterface
+    public function fetchById(int|string $loginAttemptId): DomainObjectInterface
     {
         $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE login_attempt_id = :id");
 
