@@ -28,7 +28,7 @@
         "phpunit/phpunit": ">=9.0",
         "linna/framework": "^0.27.0",
         "linna/db-dumps": "dev-master",
-        "linna/auth-mapper-test-trait": "dev-master"
+        "linna/auth-mapper-test-trait": "^0.2"
     },
     "autoload": {
         "psr-4": {
