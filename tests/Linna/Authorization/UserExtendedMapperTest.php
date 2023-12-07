@@ -12,17 +12,17 @@ declare(strict_types=1);
 namespace Linna\Authorization;
 
 use Linna\Authentication\Password;
-use Linna\Authentication\UserMapper;
+//use Linna\Authentication\UserMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Enhanced User Mapper Test.
+ * User Extended Mapper Test.
  */
-class EnhancedUserMapperTest extends TestCase
+class UserExtendedMapperTest extends TestCase
 {
-    use EnhancedUserMapperTrait;
+    use UserExtendedMapperTrait;
 
     /**
      * Setup.
@@ -46,12 +46,14 @@ class EnhancedUserMapperTest extends TestCase
         $password = new Password();
 
         $permissionMapper = new PermissionMapper($pdo);
-        $role2userMapper = new RoleToUserMapper($pdo, $password);
-        $userMapper = new UserMapper($pdo, $password);
+        $roleMapper = new RoleMapper($pdo);
 
+        $userExtendedMapper = new UserExtendedMapper($pdo, $password, $permissionMapper, $roleMapper);
+
+        //declared in trait
         self::$pdo = $pdo;
         self::$permissionMapper = $permissionMapper;
-        self::$roleMapper = new RoleMapper($pdo, $permissionMapper, $userMapper, $role2userMapper);
-        self::$enhancedUserMapper = new EnhancedUserMapper($pdo, $password, $permissionMapper, $role2userMapper);
+        self::$roleMapper = $roleMapper;
+        self::$userExtendedMapper = $userExtendedMapper;
     }
 }

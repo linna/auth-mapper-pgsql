@@ -11,18 +11,18 @@ declare(strict_types=1);
 
 namespace Linna\Authorization;
 
-//use Linna\Authentication\Password;
+use Linna\Authentication\Password;
 //use Linna\Authentication\UserMapper;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Role Mapper Test.
+ * Permission Mapper Test.
  */
-class RoleMapperTest extends TestCase
+class PermissionExtendedMapperTest extends TestCase
 {
-    use RoleMapperTrait;
+    use PermissionExtendedMapperTrait;
 
     /**
      * Setup.
@@ -43,12 +43,17 @@ class RoleMapperTest extends TestCase
         ];
 
         $pdo = (new StorageFactory('pdo', $options))->get();
+        $password = new Password();
 
         $roleMapper = new RoleMapper($pdo);
+        $userMapper = new UserMapper($pdo, $password);
+        $permissionExtendedMapper = new PermissionExtendedMapper($pdo, $roleMapper, $userMapper);
 
         //declared in trait
         self::$pdo = $pdo;
         self::$roleMapper = $roleMapper;
+        self::$userMapper = $userMapper;
+        self::$permissionExtendedMapper = $permissionExtendedMapper;
     }
 
     /**
@@ -58,6 +63,6 @@ class RoleMapperTest extends TestCase
      */
     public static function tearDownAfterClass(): void
     {
-        self::$pdo->exec('ALTER SEQUENCE public.user_user_id_seq RESTART WITH 4 INCREMENT BY 1;');
+        self::$pdo->exec('ALTER TABLE permission AUTO_INCREMENT = 0');
     }
 }

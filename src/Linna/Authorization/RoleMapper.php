@@ -12,54 +12,78 @@ declare(strict_types=1);
 namespace Linna\Authorization;
 
 use InvalidArgumentException;
-use Linna\Authentication\UserMapperInterface;
+use DateTimeImmutable;
 use Linna\DataMapper\DomainObjectInterface;
 use Linna\DataMapper\MapperAbstract;
 use Linna\DataMapper\NullDomainObject;
 use Linna\Storage\ExtendedPDO;
 use PDO;
-use PDOException;
-use PDOStatement;
 use RuntimeException;
+use stdClass;
 
 /**
  * Role Mapper.
  */
 class RoleMapper extends MapperAbstract implements RoleMapperInterface
 {
-    /** @var ExtendedPDO Database Connection */
-    protected ExtendedPDO $pdo;
+    protected const QUERY_BASE = 'SELECT role_id, name, description, active, created, last_update FROM public.role';
 
-    /** @var PermissionMapperInterface Permission Mapper */
-    protected PermissionMapperInterface $permissionMapper;
-
-    /** @var UserMapperInterface Permission Mapper */
-    protected UserMapperInterface $userMapper;
-
-    /** @var RoleToUserMapperInterface Role To User Mapper */
-    protected RoleToUserMapperInterface $roleToUserMapper;
-
-    /** @var string Constant part of SELECT query */
-    protected string $baseQuery = 'SELECT role_id AS "id", name, description, active, created, last_update AS "lastUpdate" FROM public.role';
+    private const EXCEPTION_MESSAGE = 'Domain Object parameter must be instance of EnhancedUser class';
 
     /**
      * Constructor.
      *
-     * @param ExtendedPDO               $pdo
-     * @param PermissionMapperInterface $permissionMapper
-     * @param UserMapperInterface       $userMapper
-     * @param RoleToUserMapperInterface $roleToUserMapper
+     * @param ExtendedPDO $pdo Valid <code>PDO</code> instace to interact with the persistent storage.
+     *
      */
     public function __construct(
-        ExtendedPDO $pdo,
-        PermissionMapperInterface $permissionMapper,
-        UserMapperInterface $userMapper,
-        RoleToUserMapperInterface $roleToUserMapper
+        /** @var ExtendedPDO Database Connection. */
+        protected ExtendedPDO $pdo,
     ) {
-        $this->pdo = $pdo;
-        $this->permissionMapper = $permissionMapper;
-        $this->userMapper = $userMapper;
-        $this->roleToUserMapper = $roleToUserMapper;
+    }
+
+    /**
+     * Hydrate an array of objects.
+     *
+     * @param array<int, stdClass> $array The array containing the resultset from database.
+     *
+     * @return array<int, EnhancedUser>
+     */
+    protected function hydrator(array $array): array
+    {
+        $tmp = [];
+
+        foreach ($array as $value) {
+            $tmp[] = new Role(
+                id:              $value->role_id,
+                name:            $value->name,
+                description:     $value->description,
+                active:          (int) $value->active,
+                created:         new DateTimeImmutable($value->created),
+                lastUpdate:      new DateTimeImmutable($value->last_update),
+            );
+        }
+
+        return $tmp;
+    }
+
+    /**
+     * Hydrate an object.
+     *
+     * @param object $object The object containing the resultset from database.
+     *
+     * @return DomainObjectInterface
+     */
+    protected function hydratorSingle(object $object): DomainObjectInterface
+    {
+        return new Role(
+            id:              $object->role_id,
+            name:            $object->name,
+            description:     $object->description,
+            active:          (int) $object->active,
+            created:         new DateTimeImmutable($object->created),
+            lastUpdate:      new DateTimeImmutable($object->last_update),
+        );
     }
 
     /**
@@ -67,22 +91,18 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchById(int|string $roleId): DomainObjectInterface
     {
-        $users = $this->roleToUserMapper->fetchByRoleId($roleId);
-        $permissions = $this->permissionMapper->fetchByRoleId($roleId);
+        //make query
+        $stmt = $this->pdo->prepare(self::QUERY_BASE.' WHERE role_id = :id');
+        $stmt->bindParam(':id', $roleId, PDO::PARAM_INT);
+        $stmt->execute();
 
-        $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE role_id = :id");
-        $pdos->bindParam(':id', $roleId, PDO::PARAM_INT);
-        $pdos->execute();
-
-        $role = $pdos->fetchObject(Role::class, [$users, $permissions]);
-
-        unset($users, $permissions);
-
-        if ($role instanceof Role) {
-            return $role;
+        //fail fast
+        if (($stdClass = $stmt->fetchObject()) === false) {
+            return new NullDomainObject();
         }
 
-        return new NullDomainObject();
+        //return result
+        return $this->hydratorSingle($stdClass);
     }
 
     /**
@@ -90,22 +110,21 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByName(string $roleName): DomainObjectInterface
     {
-        $users = $this->roleToUserMapper->fetchByRoleName($roleName);
-        $permissions = $this->permissionMapper->fetchByRoleName($roleName);
+        //handle user name
+        $hashedRoleName = \md5($roleName);
 
-        $pdos = $this->pdo->prepare("{$this->baseQuery} WHERE name = :name");
-        $pdos->bindParam(':name', $roleName, PDO::PARAM_STR);
-        $pdos->execute();
+        //make query
+        $stmt = $this->pdo->prepare(self::QUERY_BASE.' WHERE md5(name) = :name');
+        $stmt->bindParam(':name', $hashedRoleName, PDO::PARAM_STR);
+        $stmt->execute();
 
-        $role = $pdos->fetchObject(Role::class, [$users, $permissions]);
-
-        unset($users, $permissions);
-
-        if ($role instanceof Role) {
-            return $role;
+        //fail fast
+        if (($stdClass = $stmt->fetchObject()) === false) {
+            return new NullDomainObject();
         }
 
-        return new NullDomainObject();
+        //return result
+        return $this->hydratorSingle($stdClass);
     }
 
     /**
@@ -113,10 +132,19 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchAll(): array
     {
-        $pdos = $this->pdo->prepare($this->baseQuery);
-        $pdos->execute();
+        //make query
+        $stmt = $this->pdo->prepare(self::QUERY_BASE);
+        $stmt->execute();
 
-        return $this->roleCompositor($pdos);
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
@@ -124,12 +152,21 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchLimit(int $offset, int $rowCount): array
     {
-        $pdos = $this->pdo->prepare("{$this->baseQuery} LIMIT :rowcount OFFSET :offset");
-        $pdos->bindParam(':offset', $offset, PDO::PARAM_INT);
-        $pdos->bindParam(':rowcount', $rowCount, PDO::PARAM_INT);
-        $pdos->execute();
+        //make query
+        $stmt = $this->pdo->prepare(self::QUERY_BASE.' ORDER BY name ASC LIMIT :rowcount OFFSET :offset');
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindParam(':rowcount', $rowCount, PDO::PARAM_INT);
+        $stmt->execute();
 
-        return $this->roleCompositor($pdos);
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
@@ -137,7 +174,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByPermission(Permission $permission): array
     {
-        return $this->fetchByPermissionId((int) $permission->getId());
+        return $this->fetchByPermissionId($permission->getId());
     }
 
     /**
@@ -145,17 +182,29 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByPermissionId(int|string $permissionId): array
     {
-        $pdos = $this->pdo->prepare('
-        SELECT r.role_id AS "id", r.name, r.description, r.active, r.created, r.last_update AS "lastUpdate"
-        FROM public.role AS r
-        INNER JOIN public.role_permission AS rp 
-        ON r.role_id = rp.role_id
-        WHERE rp.permission_id = :id');
+        //make query
+        $stmt = $this->pdo->prepare('
+        SELECT 
+            r.role_id, r.name, r.description, r.active, r.created, r.last_update
+        FROM
+            public.role AS r
+                INNER JOIN
+            public.role_permission AS rp ON r.role_id = rp.role_id
+        WHERE
+            rp.permission_id = :id');
 
-        $pdos->bindParam(':id', $permissionId, PDO::PARAM_INT);
-        $pdos->execute();
+        $stmt->bindParam(':id', $permissionId, PDO::PARAM_INT);
+        $stmt->execute();
 
-        return $this->roleCompositor($pdos);
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
@@ -163,15 +212,37 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByPermissionName(string $permissionName): array
     {
-        $permission = $this->permissionMapper->fetchByName($permissionName);
+        //make query
+        $stmt = $this->pdo->prepare('
+        SELECT 
+            r.role_id, r.name, r.description, r.active, r.created, r.last_update
+        FROM
+            public.role AS r
+                INNER JOIN
+            public.role_permission AS rp ON r.role_id = rp.role_id
+                INNER JOIN
+            public.permission as p ON rp.permission_id = p.permission_id
+        WHERE
+            p.name = :name');
 
-        return $this->fetchByPermissionId((int)$permission->getId());
+        $stmt->bindParam(':name', $permissionName, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fetchByUser(EnhancedUser $user): array
+    public function fetchByUser(User $user): array
     {
         return $this->fetchByUserId($user->getId());
     }
@@ -181,17 +252,29 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByUserId(int|string $userId): array
     {
-        $pdos = $this->pdo->prepare('
-        SELECT r.role_id AS "id", r.name, r.description, r.active, r.created, r.last_update AS "lastUpdate"
-        FROM public.role AS r
-        INNER JOIN public.user_role AS ur 
-        ON r.role_id = ur.role_id
-        WHERE ur.user_id = :id');
+        //make query
+        $stmt = $this->pdo->prepare('
+        SELECT 
+            r.role_id, r.name, r.description, r.active, r.created, r.last_update
+        FROM
+            public.role AS r
+                INNER JOIN
+            public.user_role AS ur ON r.role_id = ur.role_id
+        WHERE
+            ur.user_id = :id');
 
-        $pdos->bindParam(':id', $userId, PDO::PARAM_INT);
-        $pdos->execute();
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
 
-        return $this->roleCompositor($pdos);
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
@@ -199,9 +282,31 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     public function fetchByUserName(string $userName): array
     {
-        $user = $this->userMapper->fetchByName($userName);
+        //make query
+        $stmt = $this->pdo->prepare('
+        SELECT 
+            r.role_id, r.name, r.description, r.active, r.created, r.last_update
+        FROM
+            public.role AS r
+                INNER JOIN
+            public.user_role AS ur ON r.role_id = ur.role_id
+                INNER JOIN
+            public.user AS u ON ur.user_id = u.user_id
+        WHERE
+            u.name = :name');
 
-        return $this->fetchByUserId((int)$user->getId());
+        $stmt->bindParam(':name', $userName, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetchAll(PDO::FETCH_CLASS, stdClass::class);
+
+        //fail fast, returns the empty array
+        if (\count($result) === 0) {
+            return $result;
+        }
+
+        //return result
+        return $this->hydrator($result);
     }
 
     /**
@@ -213,7 +318,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      *
      * @return array
      */
-    protected function roleCompositor(PDOStatement &$pdos): array
+    /*protected function roleCompositor(PDOStatement &$pdos): array
     {
         $roles = [];
 
@@ -241,7 +346,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function grantPermission(Role &$role, Permission $permission)
+    /*public function grantPermission(Role &$role, Permission $permission)
     {
         $this->grantPermissionById($role, $permission->getId());
     }
@@ -249,27 +354,27 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function grantPermissionById(Role &$role, int|string $permissionId)
-    {
-        $roleId = $role->getId();
+    /* public function grantPermissionById(Role &$role, int|string $permissionId)
+     {
+         $roleId = $role->getId();
 
-        try {
-            $pdos = $this->pdo->prepare('INSERT INTO public.role_permission (role_id, permission_id) VALUES (:role_id, :permission_id)');
+         try {
+             $pdos = $this->pdo->prepare('INSERT INTO public.role_permission (role_id, permission_id) VALUES (:role_id, :permission_id)');
 
-            $pdos->bindParam(':role_id', $roleId, PDO::PARAM_INT);
-            $pdos->bindParam(':permission_id', $permissionId, PDO::PARAM_INT);
-            $pdos->execute();
+             $pdos->bindParam(':role_id', $roleId, PDO::PARAM_INT);
+             $pdos->bindParam(':permission_id', $permissionId, PDO::PARAM_INT);
+             $pdos->execute();
 
-            $role = $this->fetchById((int) $roleId);
-        } catch (PDOException $e) {
-            //here log the error
-        }
-    }
+             $role = $this->fetchById((int) $roleId);
+         } catch (PDOException $e) {
+             //here log the error
+         }
+     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function grantPermissionByName(Role &$role, string $permissionName)
+     /**
+      * {@inheritdoc}
+      */
+    /*public function grantPermissionByName(Role &$role, string $permissionName)
     {
         $permission = $this->permissionMapper->fetchByName($permissionName);
 
@@ -279,7 +384,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function revokePermission(Role &$role, Permission $permission)
+    /*public function revokePermission(Role &$role, Permission $permission)
     {
         $this->revokePermissionById($role, $permission->getId());
     }
@@ -287,7 +392,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function revokePermissionById(Role &$role, int|string $permissionId)
+    /*public function revokePermissionById(Role &$role, int|string $permissionId)
     {
         $roleId = $role->getId();
 
@@ -303,7 +408,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function revokePermissionByName(Role &$role, string $permissionName)
+    /*public function revokePermissionByName(Role &$role, string $permissionName)
     {
         $permission = $this->permissionMapper->fetchByName($permissionName);
 
@@ -313,7 +418,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function addUser(Role &$role, EnhancedUser $user)
+    /*public function addUser(Role &$role, EnhancedUser $user)
     {
         $this->addUserById($role, $user->getId());
     }
@@ -321,7 +426,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function addUserById(Role &$role, int|string $userId)
+    /*public function addUserById(Role &$role, int|string $userId)
     {
         $roleId = $role->getId();
 
@@ -341,7 +446,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function addUserByName(Role &$role, string $userName)
+    /*public function addUserByName(Role &$role, string $userName)
     {
         $user = $this->userMapper->fetchByName($userName);
 
@@ -351,7 +456,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function removeUser(Role &$role, EnhancedUser $user)
+    /*public function removeUser(Role &$role, EnhancedUser $user)
     {
         $this->removeUserById($role, $user->getId());
     }
@@ -359,7 +464,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function removeUserById(Role &$role, int|string $userId)
+    /*public function removeUserById(Role &$role, int|string $userId)
     {
         $roleId = $role->getId();
 
@@ -375,7 +480,7 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function removeUserByName(Role &$role, string $userName)
+    /*public function removeUserByName(Role &$role, string $userName)
     {
         $user = $this->userMapper->fetchByName($userName);
 
@@ -395,15 +500,23 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     protected function concreteInsert(DomainObjectInterface &$role): void
     {
-        $this->checkDomainObjectType($role);
+        \assert($role instanceof Role, new InvalidArgumentException(self::EXCEPTION_MESSAGE));
+
+        //get value to be passed as reference
+        $created = $role->created->format(DATE_ATOM);
+        $lastUpdate = $role->lastUpdate->format(DATE_ATOM);
 
         try {
-            $pdos = $this->pdo->prepare('INSERT INTO public.role (name, description, active) VALUES (:name, :description, :active)');
+            //make query
+            $stmt = $this->pdo->prepare('INSERT INTO public.role (name, description, active, created, last_update) VALUES (:name, :description, :active, :created, :last_update)');
 
-            $pdos->bindParam(':name', $role->name, PDO::PARAM_STR);
-            $pdos->bindParam(':description', $role->description, PDO::PARAM_STR);
-            $pdos->bindParam(':active', $role->active, PDO::PARAM_BOOL);
-            $pdos->execute();
+            $stmt->bindParam(':name', $role->name, PDO::PARAM_STR);
+            $stmt->bindParam(':description', $role->name, PDO::PARAM_STR);
+            $stmt->bindParam(':active', $role->active, PDO::PARAM_INT);
+            $stmt->bindParam(':created', $created, PDO::PARAM_STR);
+            $stmt->bindParam(':last_update', $lastUpdate, PDO::PARAM_STR);
+
+            $stmt->execute();
 
             $role->setId((int) $this->pdo->lastInsertId());
         } catch (RuntimeException $e) {
@@ -416,18 +529,23 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     protected function concreteUpdate(DomainObjectInterface $role): void
     {
-        $this->checkDomainObjectType($role);
+        \assert($role instanceof Role, new InvalidArgumentException(self::EXCEPTION_MESSAGE));
 
+        //get value to be passed as reference
         $objId = $role->getId();
+        $lastUpdate = $role->lastUpdate->format(DATE_ATOM);
 
         try {
-            $pdos = $this->pdo->prepare('UPDATE public.role SET name = :name, description = :description, active = :active WHERE (role_id = :id)');
+            //make query
+            $stmt = $this->pdo->prepare('UPDATE public.role SET name = :name, description = :description, active = :active, last_update = :last_update  WHERE (role_id = :id)');
 
-            $pdos->bindParam(':id', $objId, PDO::PARAM_INT);
-            $pdos->bindParam(':name', $role->name, PDO::PARAM_STR);
-            $pdos->bindParam(':description', $role->description, PDO::PARAM_STR);
-            $pdos->bindParam(':active', $role->active, PDO::PARAM_BOOL);
-            $pdos->execute();
+            $stmt->bindParam(':id', $objId, PDO::PARAM_INT);
+            $stmt->bindParam(':name', $role->name, PDO::PARAM_STR);
+            $stmt->bindParam(':description', $role->description, PDO::PARAM_STR);
+            $stmt->bindParam(':active', $role->active, PDO::PARAM_INT);
+            $stmt->bindParam(':last_update', $lastUpdate, PDO::PARAM_STR);
+
+            $stmt->execute();
         } catch (RuntimeException $e) {
             echo 'Update not compled, ', $e->getMessage(), "\n";
         }
@@ -438,29 +556,21 @@ class RoleMapper extends MapperAbstract implements RoleMapperInterface
      */
     protected function concreteDelete(DomainObjectInterface &$role): void
     {
-        $this->checkDomainObjectType($role);
+        \assert($role instanceof Role, new InvalidArgumentException(self::EXCEPTION_MESSAGE));
 
+        //get value to be passed as reference
         $objId = $role->getId();
 
         try {
-            $pdos = $this->pdo->prepare('DELETE FROM public.role WHERE role_id = :id');
+            //make query
+            $stmt = $this->pdo->prepare('DELETE FROM public.role WHERE role_id = :id');
 
-            $pdos->bindParam(':id', $objId, PDO::PARAM_INT);
-            $pdos->execute();
+            $stmt->bindParam(':id', $objId, PDO::PARAM_INT);
+            $stmt->execute();
 
             $role = new NullDomainObject();
         } catch (RuntimeException $e) {
             echo 'Delete not compled, ', $e->getMessage(), "\n";
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function checkDomainObjectType(DomainObjectInterface $domainObject): void
-    {
-        if (!($domainObject instanceof Role)) {
-            throw new InvalidArgumentException('Domain Object parameter must be instance of Role class');
         }
     }
 }

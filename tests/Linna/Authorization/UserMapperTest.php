@@ -9,8 +9,9 @@
  */
 declare(strict_types=1);
 
-namespace Linna\Authentication;
+namespace Linna\Authorization;
 
+use Linna\Authentication\Password;
 use Linna\Storage\StorageFactory;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -42,10 +43,9 @@ class UserMapperTest extends TestCase
 
         $pdo = (new StorageFactory('pdo', $options))->get();
 
+        //declared in trait
         self::$pdo = $pdo;
         self::$userMapper = new UserMapper($pdo, new Password());
-
-        self::$pdo->exec('ALTER SEQUENCE public.user_user_id_seq RESTART WITH 8 INCREMENT BY 1;');
     }
 
     /**
