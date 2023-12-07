@@ -7,3 +7,4 @@ vendor/
 .php-cs-fixer.cache
 .phpunit.result.cache
 phpunit.local.xml
+.phpunit.cache
