@@ -117,7 +117,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
     public function fetchByName(string $permissionName): DomainObjectInterface
     {
         //handle permission name
-        $hashedPermissionName = \md5($permissionName);
+        $hashedPermissionName = md5($permissionName);
 
         //make query
         $stmt = $this->pdo->prepare(self::QUERY_BASE.' WHERE md5(name) = :name');
@@ -384,7 +384,7 @@ class PermissionMapper extends MapperAbstract implements PermissionMapperInterfa
         }
 
         //return result
-        return \array_flip($result);
+        return array_flip($result);
     }
 
     /**

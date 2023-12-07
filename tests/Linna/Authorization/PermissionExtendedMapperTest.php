@@ -63,6 +63,6 @@ class PermissionExtendedMapperTest extends TestCase
      */
     public static function tearDownAfterClass(): void
     {
-        self::$pdo->exec('ALTER TABLE permission AUTO_INCREMENT = 0');
+        //self::$pdo->exec('ALTER TABLE permission AUTO_INCREMENT = 0');
     }
 }

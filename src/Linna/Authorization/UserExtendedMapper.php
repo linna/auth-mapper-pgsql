@@ -101,7 +101,7 @@ class UserExtendedMapper extends UserMapper implements UserExtendedMapperInterfa
                 description:     $value->description,
                 email:           $value->email,
                 password:        $value->password,
-                active:          $value->active,
+                active:          (int) $value->active,
                 created:         new DateTimeImmutable($value->created),
                 lastUpdate:      new DateTimeImmutable($value->last_update),
                 roles:           $roles,
@@ -133,7 +133,7 @@ class UserExtendedMapper extends UserMapper implements UserExtendedMapperInterfa
             description:     $object->description,
             email:           $object->email,
             password:        $object->password,
-            active:          $object->active,
+            active:          (int) $object->active,
             created:         new DateTimeImmutable($object->created),
             lastUpdate:      new DateTimeImmutable($object->last_update),
             roles:           $roles,
@@ -159,7 +159,7 @@ class UserExtendedMapper extends UserMapper implements UserExtendedMapperInterfa
 
         try {
             //make query
-            $stmt = $this->pdo->prepare('INSERT INTO public.user_permission (user_id, permission_id) VALUES (:user_id, :permission_id) ON DUPLICATE KEY UPDATE user_id = :user_id, permission_id = :permission_id');
+            $stmt = $this->pdo->prepare('INSERT INTO public.user_permission (user_id, permission_id) VALUES (:user_id, :permission_id) ON CONFLICT (user_id, permission_id) DO UPDATE SET user_id = :user_id, permission_id = :permission_id');
 
             $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
             $stmt->bindParam(':permission_id', $permissionId, PDO::PARAM_INT);
@@ -245,7 +245,7 @@ class UserExtendedMapper extends UserMapper implements UserExtendedMapperInterfa
 
         try {
             //make query
-            $stmt = $this->pdo->prepare('INSERT INTO public.user_role (user_id, role_id) VALUES (:user_id, :role_id)  ON DUPLICATE KEY UPDATE user_id = :user_id, role_id = :role_id');
+            $stmt = $this->pdo->prepare('INSERT INTO public.user_role (user_id, role_id) VALUES (:user_id, :role_id)  ON CONFLICT (user_id, role_id) DO UPDATE SET user_id = :user_id, role_id = :role_id');
 
             $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
             $stmt->bindParam(':role_id', $roleId, PDO::PARAM_INT);

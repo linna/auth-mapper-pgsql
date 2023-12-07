@@ -164,7 +164,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     public function fetchAttemptsWithSameUser(string $userName, int $timeInSeconds): int
     {
         //handle time
-        $time = \date(DATE_ATOM, \time() - $timeInSeconds);
+        $time = date(DATE_ATOM, time() - $timeInSeconds);
 
         //make query
         $stmt = $this->pdo->prepare('SELECT count(user_name) as attempts FROM public.login_attempt WHERE user_name = :user_name AND date_time > :time');
@@ -187,7 +187,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     public function fetchAttemptsWithSameSession(string $sessionId, int $timeInSeconds): int
     {
         //handle time
-        $time = \date(DATE_ATOM, \time() - $timeInSeconds);
+        $time = date(DATE_ATOM, time() - $timeInSeconds);
 
         //make query
         $stmt = $this->pdo->prepare('SELECT count(session_id) as attempts FROM public.login_attempt WHERE session_id = :session_id AND date_time > :time');
@@ -210,7 +210,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     public function fetchAttemptsWithSameIp(string $ipAddress, int $timeInSeconds): int
     {
         //handle time
-        $time = \date(DATE_ATOM, \time() - $timeInSeconds);
+        $time = date(DATE_ATOM, time() - $timeInSeconds);
 
         //make query
         $stmt = $this->pdo->prepare('SELECT count(ip) as attempts FROM public.login_attempt WHERE ip = :ip AND date_time > :time');
@@ -232,7 +232,7 @@ class EnhancedAuthenticationMapper extends MapperAbstract implements EnhancedAut
     public function deleteOldLoginAttempts(int $timeInSeconds): bool
     {
         //handle time
-        $time = \date(DATE_ATOM, \time() - $timeInSeconds);
+        $time = date(DATE_ATOM, time() - $timeInSeconds);
 
         //make query
         $stmt = $this->pdo->prepare('DELETE FROM public.login_attempt WHERE date_time < :time');

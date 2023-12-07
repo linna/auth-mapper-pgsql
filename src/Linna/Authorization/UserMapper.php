@@ -136,7 +136,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
     public function fetchByName(string $userName): DomainObjectInterface
     {
         //handle user name
-        $hashedUserName = \md5($userName);
+        $hashedUserName = md5($userName);
 
         //make query
         $stmt = $this->pdo->prepare(self::QUERY_BASE.' WHERE md5(name) = :name');
@@ -411,7 +411,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
 
             $stmt->execute();
 
-            \settype($user->active, "integer");
+            settype($user->active, "integer");
 
             $user->setId((int) $this->pdo->lastInsertId());
         } catch (RuntimeException $e) {
@@ -450,7 +450,7 @@ class UserMapper extends MapperAbstract implements UserMapperInterface
 
             $stmt->execute();
 
-            \settype($user->active, "integer");
+            settype($user->active, "integer");
 
         } catch (RuntimeException $e) {
             echo 'Update not compled, ', $e->getMessage(), "\n";

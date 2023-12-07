@@ -56,4 +56,14 @@ class UserExtendedMapperTest extends TestCase
         self::$roleMapper = $roleMapper;
         self::$userExtendedMapper = $userExtendedMapper;
     }
+
+    /**
+     * Tear Down.
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        self::$pdo->exec('ALTER SEQUENCE public.user_user_id_seq RESTART WITH 8 INCREMENT BY 1;');
+    }
 }

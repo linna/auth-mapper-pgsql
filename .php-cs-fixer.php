@@ -7,7 +7,7 @@ return $config
         '@PSR12' => true,
         'no_whitespace_in_blank_line' => true,
         'return_type_declaration' => true,
-        'native_function_invocation' => ['include' => ['@all']],
+        'native_function_invocation' => ['include' => ['@compiler_optimized']],
         'phpdoc_align' => true,
         'phpdoc_separation' => true,
         'phpdoc_line_span' => ['property' => 'single', 'const' => 'single']
