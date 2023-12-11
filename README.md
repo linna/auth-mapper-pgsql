@@ -21,7 +21,7 @@
 > **_NOTE:_**  Code porting to PHP 8.1 ongoing.
 
 # About
-This package provide a concrete implementation for authentication interfaces and 
+This package provide a concrete implementation for the authentication interfaces and 
 for the authorization interfaces of the framework.
 
 Mappers use as persistent storage postgresql through php pdo.
@@ -31,7 +31,7 @@ Mappers use as persistent storage postgresql through php pdo.
    * PHP >= 8.1
    * PDO extension
    * Postgresql extension
-   * linna/framework v0.27.0
+   * linna/framework v0.28.0|next
 
 # Installation
 With composer:
@@ -40,18 +40,85 @@ composer require linna/auth-mapper-pgsql
 ```
 
 # Package Content
-Implementation of framework interfaces:
-* `Linna\Authentication\EnhancedAuthenticationMapperInterface`
-* `Linna\Authentication\UserMapperInterface`
-* `Linna\Authorization\EnhancedUserMapperInterface`
-* `Linna\Authorization\PermissionMapperInterface`
-* `Linna\Authorization\RoleMapperInterface`
-* `Linna\Authorization\RoleToUserMapperInterface`
 
-As:
+### Interfaces from Framework
+* `Linna\Authentication\EnhancedAuthenticationMapperInterface`
+* `Linna\Authorization\PermissionExtendedMapperInterface`
+* `Linna\Authorization\PermissionMapperInterface`
+* `Linna\Authorization\RoleExtendedMapperInterface`
+* `Linna\Authorization\RoleMapperInterface`
+* `Linna\Authorization\UserExtendedMapperInterface`
+* `Linna\Authorization\UserMapperInterface`
+
+### Implementation
 * `Linna\Authentication\EnhancedAuthenticationMapper`
-* `Linna\Authentication\UserMapper`
-* `Linna\Authorization\EnhancedUserMapper`
+    - deleteOldLoginAttempts()
+    - fetchAll()
+    - fetchAttemptsWithSameIp()
+    - fetchAttemptsWithSameSession()
+    - fetchAttemptsWithSameUser()
+    - fetchById()
+    - fetchLimit()
+* `Linna\Authorization\PermissionExtendedMapper`
 * `Linna\Authorization\PermissionMapper`
+    - fetchAll()
+    - fetchById()
+    - fetchByName()
+    - fetchByRole()
+    - fetchByRoleId()
+    - fetchByRoleName()
+    - fetchByUser()
+    - fetchByUserId()
+    - fetchByUserName()
+    - fetchLimit()
+    - fetchUserPermissionHashTable()
+    - permissionExistById()
+    - permissionExistByName()
+* `Linna\Authorization\RoleExtendedMapper`
+    - addUser()
+    - addUserById()
+    - addUserByName()
+    - grantPermission()
+    - grantPermissionById()
+    - grantPermissionByName()
+    - removeUser()
+    - removeUserById()
+    - removeUserByName()
+    - revokePermission()
+    - revokePermissionById()
+    - revokePermissionByName()
 * `Linna\Authorization\RoleMapper`
-* `Linna\Authorization\RoleToUserMapper`
+    - fetchAll()
+    - fetchById()
+    - fetchByName()
+    - fetchByPermission()
+    - fetchByPermissionId()
+    - fetchByPermissionName()
+    - fetchByUser()
+    - fetchByUserId()
+    - fetchByUserName()
+    - fetchLimit()
+* `Linna\Authorization\UserExtendedMapper`
+    - addRole()
+    - addRoleById()
+    - addRoleByName()
+    - grantPermission()
+    - grantPermissionById()
+    - grantPermissionByName()
+    - removeRole()
+    - removeRoleById()
+    - removeRoleByName()
+    - revokePermission()
+    - revokePermissionById()
+    - revokePermissionByName()
+* `Linna\Authorization\UserMapper`
+    - fetchAll()
+    - fetchById()
+    - fetchByName()
+    - fetchByPermission()
+    - fetchByPermissionId()
+    - fetchByPermissionName()
+    - fetchByRole()
+    - fetchByRoleId()
+    - fetchByRoleName()
+    - fetchLimit()
