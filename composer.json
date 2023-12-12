@@ -27,8 +27,8 @@
         "phpstan/phpstan": ">=1.8",
         "phpunit/phpunit": ">=9.0",
         "linna/framework": "dev-data-mapper",
-        "linna/db-dumps": "dev-master",
-        "linna/auth-mapper-test-trait": "dev-b0.3"
+        "linna/db-dumps": ">=v0.28",
+        "linna/auth-mapper-test-trait": ">=v0.3"
     },
     "autoload": {
         "psr-4": {
